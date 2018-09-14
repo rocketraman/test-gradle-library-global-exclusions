@@ -1,0 +1,38 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+dependencies {
+    // pull in a dep that has a transitive dependency on slf4j-log4j12
+    // (https://github.com/confluentinc/schema-registry/issues/883)
+    api 'io.confluent:kafka-avro-serializer:5.0.0'
+}
+
+// exclude slf4j-log4j12 from the configuration
+configurations {
+    // this does not work:
+    api.exclude module: 'slf4j-log4j12'
+
+    // this works:
+    // apiElements.exclude module: 'slf4j-log4j12'
+}
+
+repositories {
+    jcenter()
+    maven {
+        url 'https://packages.confluent.io/maven/'
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.rocketraman'
+            artifactId = 'test-gradle-library-global-exclusions'
+            version = '1.0'
+
+            from components.java
+        }
+    }
+}
